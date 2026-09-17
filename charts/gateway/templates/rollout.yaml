@@ -18,6 +18,9 @@ spec:
             templates:
               - templateName: integration-test
         - setWeight: 100
+        - analysis:
+            templates:
+              - templateName: integration-test
   selector:
     matchLabels:
       {{- include "gateway.selectorLabels" . | nindent 6 }}
