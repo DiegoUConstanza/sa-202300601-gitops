@@ -66,3 +66,9 @@ spec:
               port: {{ .Values.service.port }}
             initialDelaySeconds: 15
             periodSeconds: 10
+          volumeMounts:
+            - name: src-volume
+              mountPath: /app/src
+      volumes:
+        - name: src-volume
+          emptyDir: {}

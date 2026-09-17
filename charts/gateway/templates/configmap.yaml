@@ -6,6 +6,7 @@ metadata:
     {{- include "gateway.labels" . | nindent 4 }}
 data:
   PORT: "{{ .Values.service.port }}"
+  GATEWAY_PORT: "{{ .Values.service.port }}"
   NODE_ENV: "{{ .Values.env.nodeEnv | default "production" }}"
   AUTH_SERVICE_URL: "{{ .Values.env.authServiceUrl | default "http://auth-service:3000" }}"
   CURSOS_SERVICE_URL: "{{ .Values.env.cursosServiceUrl | default "http://cursos-service:3001" }}"
