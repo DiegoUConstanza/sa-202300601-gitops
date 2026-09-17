@@ -17,6 +17,15 @@ spec:
           - resources:
               kinds:
                 - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kyverno
+                - argocd
+                - argo-rollouts
+                - sa-p6
       validate:
         message: "El uso del tag 'latest' esta prohibido. Debe especificar un tag concreto o digest."
         pattern:
