@@ -54,14 +54,12 @@ spec:
               drop:
                 - ALL
           readinessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: {{ .Values.service.port }}
             initialDelaySeconds: 10
             periodSeconds: 5
           livenessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: {{ .Values.service.port }}
             initialDelaySeconds: 15
             periodSeconds: 10
