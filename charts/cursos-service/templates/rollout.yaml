@@ -1,0 +1,67 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ include "cursos-service.name" . }}
+  labels:
+    {{- include "cursos-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - analysis:
+            templates:
+              - templateName: integration-test
+        - setWeight: 50
+        - analysis:
+            templates:
+              - templateName: integration-test
+        - setWeight: 100
+  selector:
+    matchLabels:
+      {{- include "cursos-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "cursos-service.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: cursos-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              name: http
+          envFrom:
+            - configMapRef:
+                name: {{ include "cursos-service.fullname" . }}-config
+            - secretRef:
+                name: {{ include "cursos-service.fullname" . }}-secrets
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 10

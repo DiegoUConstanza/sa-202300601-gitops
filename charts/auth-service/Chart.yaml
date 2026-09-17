@@ -1,0 +1,6 @@
+apiVersion: v2
+name: auth-service
+description: Chart de Helm independiente para auth-service con Argo Rollouts
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

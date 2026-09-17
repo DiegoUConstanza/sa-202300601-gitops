@@ -1,0 +1,23 @@
+replicaCount: 2
+
+image:
+  repository: us-west1-docker.pkg.dev/project-d92eea96-0bda-4489-bb7/sa-images/progreso-service
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+
+resources:
+  limits:
+    cpu: 400m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+env:
+  rabbitmqHost: "rabbitmq.sa-p8-prod.svc.cluster.local"
+  rabbitmqPort: "5672"
+  rabbitmqUser: "sa_user"

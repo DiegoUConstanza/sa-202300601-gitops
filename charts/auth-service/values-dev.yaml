@@ -1,0 +1,26 @@
+replicaCount: 1
+
+image:
+  repository: us-west1-docker.pkg.dev/project-d92eea96-0bda-4489-bb7/sa-images/auth-service
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+env:
+  nodeEnv: development
+  jwtExpiration: "15m"
+  jwtGracePeriod: "120s"
+  rabbitmqHost: "rabbitmq.sa-p8-dev.svc.cluster.local"
+  rabbitmqPort: "5672"
+  rabbitmqUser: "sa_user"

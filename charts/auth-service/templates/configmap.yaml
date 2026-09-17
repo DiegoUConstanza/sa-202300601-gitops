@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "auth-service.fullname" . }}-config
+  labels:
+    {{- include "auth-service.labels" . | nindent 4 }}
+data:
+  PORT: "{{ .Values.service.port }}"
+  NODE_ENV: "{{ .Values.env.nodeEnv | default "production" }}"
+  JWT_EXPIRATION: "{{ .Values.env.jwtExpiration | default "5m" }}"
+  JWT_GRACE_PERIOD: "{{ .Values.env.jwtGracePeriod | default "60s" }}"
+  RABBITMQ_HOST: "{{ .Values.env.rabbitmqHost | default "rabbitmq.sa-p8-prod.svc.cluster.local" }}"
+  RABBITMQ_PORT: "{{ .Values.env.rabbitmqPort | default "5672" }}"
+  RABBITMQ_USER: "{{ .Values.env.rabbitmqUser | default "sa_user" }}"

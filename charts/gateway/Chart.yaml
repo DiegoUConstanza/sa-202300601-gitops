@@ -1,0 +1,6 @@
+apiVersion: v2
+name: gateway
+description: Chart de Helm independiente para gateway con Argo Rollouts
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

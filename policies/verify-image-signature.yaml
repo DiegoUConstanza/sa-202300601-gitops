@@ -1,0 +1,31 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-signature
+  annotations:
+    policies.kyverno.io/title: Verify Image Signature with Cosign
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: "Valida la firma digital de las imagenes generadas mediante Cosign y GitHub OIDC."
+spec:
+  validationFailureAction: Audit
+  background: false
+  rules:
+    - name: verify-cosign-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - mutateDigest: false
+          imageReferences:
+            - "us-west1-docker.pkg.dev/project-d92eea96-0bda-4489-bb7/sa-images/*"
+            - "ghcr.io/diegouconstanza/*"
+          attestors:
+            - entries:
+                - keyless:
+                    issuer: "https://token.actions.githubusercontent.com"
+                    subject: "https://github.com/DiegoUConstanza/Practicas-SA-B-202300601/.*"
+                    rekor:
+                      url: "https://rekor.sigstore.dev"
