@@ -30,6 +30,16 @@ spec:
         {{- include "progreso-service.labels" . | nindent 8 }}
     spec:
       serviceAccountName: progreso-sa
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - {{ include "progreso-service.name" . }}
+              topologyKey: "kubernetes.io/hostname"
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
