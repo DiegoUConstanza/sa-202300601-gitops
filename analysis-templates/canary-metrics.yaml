@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: canary-metrics
+  namespace: sa-p8-prod
+spec:
+  args:
+    - name: service-name
+    - name: canary-hash
+    - name: max-error-rate
+      value: "0.05"
+    - name: max-p95-seconds
+      value: "0.5"
+    - name: min-rps
+      value: "0"
+  metrics:
+    - name: tasa-de-error-candidata
+      initialDelay: 60s
+      interval: 30s
+      count: 6
+      failureLimit: 3
+      failureCondition: result[0] >= {{args.max-error-rate}}
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.observability.svc:9090
+          query: |
+            (
+              (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="{{args.service-name}}",rollouts_pod_template_hash="{{args.canary-hash}}",http_response_status_code=~"5.."}[2m])) or vector(0))
+              / sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="{{args.service-name}}",rollouts_pod_template_hash="{{args.canary-hash}}"}[2m]))
+            ) or vector(0)
+    - name: p95-candidata
+      initialDelay: 60s
+      interval: 30s
+      count: 6
+      failureLimit: 3
+      failureCondition: result[0] > {{args.max-p95-seconds}}
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.observability.svc:9090
+          query: |
+            histogram_quantile(0.95,
+              sum by (le) (rate(http_server_request_duration_seconds_bucket{namespace="sa-p8-prod",app="{{args.service-name}}",rollouts_pod_template_hash="{{args.canary-hash}}"}[2m]))
+            ) or vector(0)
+    - name: guarda-de-trafico
+      initialDelay: 60s
+      interval: 30s
+      count: 6
+      failureLimit: 3
+      successCondition: result[0] >= {{args.min-rps}}
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.observability.svc:9090
+          query: |
+            sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="{{args.service-name}}",rollouts_pod_template_hash="{{args.canary-hash}}"}[2m])) or vector(0)

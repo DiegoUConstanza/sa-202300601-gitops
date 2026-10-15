@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: sa-microservicios
+  namespace: observability
+  labels:
+    release: kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - sa-p8-prod
+      - sa-p8-dev
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - gateway
+          - auth-service
+          - progreso-service
+          - cursos-service
+          - inscripciones-service
+  podTargetLabels:
+    - app
+    - rollouts-pod-template-hash
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s

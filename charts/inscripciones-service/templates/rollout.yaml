@@ -9,18 +9,31 @@ spec:
   strategy:
     canary:
       steps:
-        - setWeight: 20
+        - setWeight: 25
         - analysis:
             templates:
-              - templateName: integration-test
+              - templateName: canary-metrics
+            args:
+              - name: service-name
+                value: {{ include "inscripciones-service.name" . }}
+              - name: canary-hash
+                valueFrom:
+                  podTemplateHashValue: Latest
+              - name: min-rps
+                value: "0"
         - setWeight: 50
         - analysis:
             templates:
-              - templateName: integration-test
+              - templateName: canary-metrics
+            args:
+              - name: service-name
+                value: {{ include "inscripciones-service.name" . }}
+              - name: canary-hash
+                valueFrom:
+                  podTemplateHashValue: Latest
+              - name: min-rps
+                value: "0"
         - setWeight: 100
-        - analysis:
-            templates:
-              - templateName: integration-test
   selector:
     matchLabels:
       {{- include "inscripciones-service.selectorLabels" . | nindent 6 }}
@@ -42,6 +55,8 @@ spec:
           ports:
             - containerPort: {{ .Values.service.port }}
               name: http
+            - containerPort: 9464
+              name: metrics
           envFrom:
             - configMapRef:
                 name: {{ include "inscripciones-service.fullname" . }}-config

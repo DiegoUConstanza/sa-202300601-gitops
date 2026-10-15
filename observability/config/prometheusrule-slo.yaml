@@ -1,0 +1,127 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: sa-slo
+  namespace: observability
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: sa-slo-recording
+      interval: 30s
+      rules:
+        # ─── SLO 1: DISPONIBILIDAD (Gateway no-5xx) ───────────────────────
+        - record: sa:gateway_error_ratio:rate1m
+          expr: |
+            (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway",http_response_status_code=~"5.."}[1m])) or vector(0))
+            / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[1m])) > 0 or vector(1))
+        - record: sa:gateway_error_ratio:rate3m
+          expr: |
+            (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway",http_response_status_code=~"5.."}[3m])) or vector(0))
+            / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[3m])) > 0 or vector(1))
+        - record: sa:gateway_error_ratio:rate5m
+          expr: |
+            (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway",http_response_status_code=~"5.."}[5m])) or vector(0))
+            / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[5m])) > 0 or vector(1))
+        - record: sa:gateway_error_ratio:rate30m
+          expr: |
+            (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway",http_response_status_code=~"5.."}[30m])) or vector(0))
+            / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[30m])) > 0 or vector(1))
+        - record: sa:gateway_error_ratio:rate7d
+          expr: |
+            (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway",http_response_status_code=~"5.."}[7d])) or vector(0))
+            / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[7d])) > 0 or vector(1))
+        # Presupuesto consumido: 1.0 = agotado (presupuesto = 0.5% = 0.005)
+        - record: sa:gateway_error_budget_consumed:ratio_7d
+          expr: sa:gateway_error_ratio:rate7d / 0.005
+
+        # ─── SLO 2: LATENCIA (Gateway <= 500ms) ───────────────────────────
+        # Proporción de peticiones lentas (> 500ms = 0.5s): 1 - (reqs <= 0.5s / total)
+        - record: sa:gateway_latency_ratio:rate1m
+          expr: |
+            (1 - (
+              (sum(rate(http_server_request_duration_seconds_bucket{namespace="sa-p8-prod",app="gateway",le="0.5"}[1m])) or vector(0))
+              / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[1m])) > 0 or vector(1))
+            )) or vector(0)
+        - record: sa:gateway_latency_ratio:rate3m
+          expr: |
+            (1 - (
+              (sum(rate(http_server_request_duration_seconds_bucket{namespace="sa-p8-prod",app="gateway",le="0.5"}[3m])) or vector(0))
+              / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[3m])) > 0 or vector(1))
+            )) or vector(0)
+        - record: sa:gateway_latency_ratio:rate5m
+          expr: |
+            (1 - (
+              (sum(rate(http_server_request_duration_seconds_bucket{namespace="sa-p8-prod",app="gateway",le="0.5"}[5m])) or vector(0))
+              / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[5m])) > 0 or vector(1))
+            )) or vector(0)
+        - record: sa:gateway_latency_ratio:rate30m
+          expr: |
+            (1 - (
+              (sum(rate(http_server_request_duration_seconds_bucket{namespace="sa-p8-prod",app="gateway",le="0.5"}[30m])) or vector(0))
+              / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[30m])) > 0 or vector(1))
+            )) or vector(0)
+        - record: sa:gateway_latency_ratio:rate7d
+          expr: |
+            (1 - (
+              (sum(rate(http_server_request_duration_seconds_bucket{namespace="sa-p8-prod",app="gateway",le="0.5"}[7d])) or vector(0))
+              / (sum(rate(http_server_request_duration_seconds_count{namespace="sa-p8-prod",app="gateway"}[7d])) > 0 or vector(1))
+            )) or vector(0)
+        # Presupuesto consumido: 1.0 = agotado (presupuesto = 5.0% = 0.05)
+        - record: sa:gateway_latency_budget_consumed:ratio_7d
+          expr: sa:gateway_latency_ratio:rate7d / 0.05
+
+    # ─── ALERTAS MULTI-VENTANA POR TASA DE CONSUMO (BURN RATE) ────────────
+    - name: sa-slo-alerts
+      rules:
+        - alert: SaDisponibilidadConsumoRapido
+          expr: |
+            sa:gateway_error_ratio:rate3m > (14.4 * 0.005)
+            and
+            sa:gateway_error_ratio:rate1m > (14.4 * 0.005)
+          for: 30s
+          labels:
+            severity: page
+          annotations:
+            summary: "El presupuesto de error de disponibilidad se consume 14.4x mas rapido de lo sostenible"
+            intervencion_humana: "A este ritmo el presupuesto de 7 dias se agota en 11.6 horas. Requiere intervencion inmediata para revertir canary o mitigar dependencia caida."
+            runbook_url: "https://github.com/DiegoUConstanza/Practicas-SA-B-202300601/blob/main/P10/runbooks/alta-tasa-de-errores.md"
+
+        - alert: SaDisponibilidadConsumoLento
+          expr: |
+            sa:gateway_error_ratio:rate30m > (3 * 0.005)
+            and
+            sa:gateway_error_ratio:rate5m > (3 * 0.005)
+          for: 5m
+          labels:
+            severity: ticket
+          annotations:
+            summary: "Consumo sostenido del presupuesto de disponibilidad (3x)"
+            intervencion_humana: "Degradacion lenta que agotaria el presupuesto en 2.3 dias. Se atiende en horario laboral investigando errores esporadicos."
+            runbook_url: "https://github.com/DiegoUConstanza/Practicas-SA-B-202300601/blob/main/P10/runbooks/alta-tasa-de-errores.md"
+
+        - alert: SaLatenciaConsumoRapido
+          expr: |
+            sa:gateway_latency_ratio:rate3m > (14.4 * 0.05)
+            and
+            sa:gateway_latency_ratio:rate1m > (14.4 * 0.05)
+          for: 30s
+          labels:
+            severity: page
+          annotations:
+            summary: "El presupuesto de error de latencia se consume 14.4x mas rapido de lo sostenible"
+            intervencion_humana: "Mas del 72% de las peticiones superan los 500 ms. Requiere atencion inmediata por saturacion de base de datos o colas bloqueadas."
+            runbook_url: "https://github.com/DiegoUConstanza/Practicas-SA-B-202300601/blob/main/P10/runbooks/latencia-degradada.md"
+
+        - alert: SaLatenciaConsumoLento
+          expr: |
+            sa:gateway_latency_ratio:rate30m > (3 * 0.05)
+            and
+            sa:gateway_latency_ratio:rate5m > (3 * 0.05)
+          for: 5m
+          labels:
+            severity: ticket
+          annotations:
+            summary: "Consumo sostenido del presupuesto de latencia (3x)"
+            intervencion_humana: "Degradacion de latencia sostenida que agotara el margen en 2.3 dias. Se atiende revisando indices de base de datos y saturacion de pods."
+            runbook_url: "https://github.com/DiegoUConstanza/Practicas-SA-B-202300601/blob/main/P10/runbooks/latencia-degradada.md"

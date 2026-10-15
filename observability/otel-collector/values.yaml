@@ -1,0 +1,61 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# OpenTelemetry Collector values.yaml — Pipeline de trazas OTLP hacia Tempo
+# ─────────────────────────────────────────────────────────────────────────────
+
+fullnameOverride: otel-collector
+
+image:
+  repository: otel/opentelemetry-collector-contrib
+  tag: "0.100.0"
+  pullPolicy: IfNotPresent
+
+mode: deployment
+
+presets:
+  logsCollection:
+    enabled: false
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+  processors:
+    memory_limiter:
+      check_interval: 1s
+      limit_percentage: 75
+      spike_limit_percentage: 20
+    batch:
+      send_batch_size: 100
+      timeout: 1s
+
+  exporters:
+    otlp/tempo:
+      endpoint: "tempo.observability.svc:4317"
+      tls:
+        insecure: true
+
+  service:
+    pipelines:
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [otlp/tempo]
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 256Mi
+  requests:
+    cpu: 20m
+    memory: 64Mi
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
