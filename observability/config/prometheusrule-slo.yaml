@@ -76,6 +76,7 @@ spec:
       rules:
         - alert: SaDisponibilidadConsumoRapido
           expr: |
+            # Evaluacion multi-ventana de tasa de quema de presupuesto (fast burn rate 14.4x de error budget)
             sa:gateway_error_ratio:rate3m > (14.4 * 0.005)
             and
             sa:gateway_error_ratio:rate1m > (14.4 * 0.005)
@@ -89,6 +90,7 @@ spec:
 
         - alert: SaDisponibilidadConsumoLento
           expr: |
+            # Evaluacion multi-ventana de tasa de quema lenta de presupuesto (slow burn rate 3.0x de error budget)
             sa:gateway_error_ratio:rate30m > (3 * 0.005)
             and
             sa:gateway_error_ratio:rate5m > (3 * 0.005)
@@ -102,6 +104,7 @@ spec:
 
         - alert: SaLatenciaConsumoRapido
           expr: |
+            # Evaluacion multi-ventana de tasa de quema rapida de presupuesto de latencia (fast burn rate 14.4x de latency budget)
             sa:gateway_latency_ratio:rate3m > (14.4 * 0.05)
             and
             sa:gateway_latency_ratio:rate1m > (14.4 * 0.05)
@@ -115,6 +118,7 @@ spec:
 
         - alert: SaLatenciaConsumoLento
           expr: |
+            # Evaluacion multi-ventana de tasa de quema lenta de presupuesto de latencia (slow burn rate 3.0x de latency budget)
             sa:gateway_latency_ratio:rate30m > (3 * 0.05)
             and
             sa:gateway_latency_ratio:rate5m > (3 * 0.05)
