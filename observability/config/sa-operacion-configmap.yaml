@@ -264,7 +264,7 @@ data:
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
               "editorMode": "code",
-              "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"sa-p8-prod\",container!=\"\"}[2m])) / sum by (pod) (container_spec_cpu_quota{namespace=\"sa-p8-prod\",container!=\"\"} / 100000)",
+              "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"sa-p8-prod\",container!=\"\"}[2m])) / sum by (pod) (kube_pod_container_resource_limits{namespace=\"sa-p8-prod\",resource=\"cpu\",container!=\"\"})",
               "legendFormat": "{{pod}} (CPU vs Limit)",
               "range": true,
               "refId": "A"
