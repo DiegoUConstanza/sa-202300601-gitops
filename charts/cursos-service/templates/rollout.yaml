@@ -52,6 +52,10 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["node", "dist/main"]
+          volumeMounts:
+            - name: src-volume
+              mountPath: /app/src
           ports:
             - containerPort: {{ .Values.service.port }}
               name: http
@@ -81,3 +85,6 @@ spec:
               port: {{ .Values.service.port }}
             initialDelaySeconds: 15
             periodSeconds: 10
+      volumes:
+        - name: src-volume
+          emptyDir: {}

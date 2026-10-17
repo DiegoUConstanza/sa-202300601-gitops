@@ -11,6 +11,8 @@ image:
 
 mode: deployment
 
+rewriteDeprecatedComponentNames: false
+
 presets:
   logsCollection:
     enabled: false
