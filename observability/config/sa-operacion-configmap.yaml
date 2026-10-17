@@ -1,14 +1,367 @@
-"apiVersion": |-
-  v1
-"data":
-  "sa-operacion.json": "{\n  \"annotations\": {\n    \"list\": [\n      {\n        \"builtIn\": 1,\n        \"datasource\": \"-- Grafana --\",\n        \"enable\": true,\n        \"hide\": true,\n        \"name\": \"Annotations & Alerts\",\n        \"type\": \"dashboard\"\n      }\n    ]\n  },\n  \"editable\": true,\n  \"fiscalYearStartMonth\": 0,\n  \"graphTooltip\": 1,\n  \"id\": null,\n  \"links\": [],\n  \"liveNow\": false,\n  \"panels\": [\n    {\n      \"collapsed\": false,\n      \"gridPos\": { \"h\": 1, \"w\": 24, \"x\": 0, \"y\": 0 },\n      \"id\": 100,\n      \"title\": \"1. OBJETIVOS DE NIVEL DE SERVICIO (SLO) Y PRESUPUESTO DE ERROR\",\n      \"type\": \"row\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": { \"mode\": \"thresholds\" },\n          \"mappings\": [],\n          \"max\": 1,\n          \"min\": 0,\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              { \"color\": \"green\", \"value\": null },\n              { \"color\": \"#EAB839\", \"value\": 0.5 },\n              { \"color\": \"red\", \"value\": 0.9 }\n            ]\n          },\n          \"unit\": \"percentunit\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 6, \"w\": 8, \"x\": 0, \"y\": 1 },\n      \"id\": 1,\n      \"options\": {\n        \"orientation\": \"auto\",\n        \"reduceOptions\": { \"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false },\n        \"showThresholdLabels\": false,\n        \"showThresholdMarkers\": true\n      },\n      \"pluginVersion\": \"11.0.0\",\n      \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"sa:gateway_error_budget_consumed:ratio_7d or vector(0)\",\n          \"legendFormat\": \"Presupuesto Consumido (7d)\",\n          \"range\": true,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"SLO Disponibilidad: Presupuesto Consumido (7d)\",\n      \"description\": \"\xBFCu\xE1nto margen de error queda en la ventana de 7 d\xEDas? (Meta 99.5%, Presupuesto 0.5%)\",\n      \"type\": \"gauge\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": { \"mode\": \"thresholds\" },\n          \"mappings\": [],\n          \"max\": 1,\n          \"min\": 0,\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              { \"color\": \"green\", \"value\": null },\n              { \"color\": \"#EAB839\", \"value\": 0.5 },\n              { \"color\": \"red\", \"value\": 0.9 }\n            ]\n          },\n          \"unit\": \"percentunit\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 6, \"w\": 8, \"x\": 8, \"y\": 1 },\n      \"id\": 2,\n      \"options\": {\n        \"orientation\": \"auto\",\n        \"reduceOptions\": { \"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false },\n        \"showThresholdLabels\": false,\n        \"showThresholdMarkers\": true\n      },\n      \"pluginVersion\": \"11.0.0\",\n      \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"(1 - (sum(rate(http_server_request_duration_seconds_bucket{namespace=\\\"sa-p8-prod\\\",app=\\\"gateway\\\",le=\\\"0.5\\\"}[7d])) or vector(1)) / (sum(rate(http_server_request_duration_seconds_count{namespace=\\\"sa-p8-prod\\\",app=\\\"gateway\\\"}[7d])) or vector(1))) / 0.05\",\n          \"legendFormat\": \"Presupuesto Consumido (7d)\",\n          \"range\": true,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"SLO Latencia: Presupuesto Consumido (7d)\",\n      \"description\": \"\xBFCu\xE1nto margen de solicitudes lentas queda? (Meta 95% < 500ms, Presupuesto 5%)\",\n      \"type\": \"gauge\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\": { \"axisCenteredZero\": false, \"axisColorMode\": \"text\", \"drawStyle\": \"line\", \"lineInterpolation\": \"smooth\" },\n          \"mappings\": [],\n          \"thresholds\": { \"mode\": \"absolute\", \"steps\": [{ \"color\": \"green\", \"value\": null }] },\n          \"unit\": \"short\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 6, \"w\": 8, \"x\": 16, \"y\": 1 },\n      \"id\": 3,\n      \"options\": { \"legend\": { \"displayMode\": \"list\", \"placement\": \"bottom\" }, \"tooltip\": { \"mode\": \"single\" } },\n      \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"(sa:gateway_error_ratio:rate3m / 0.005) or vector(0)\",\n          \"legendFormat\": \"Burn Rate (Ventana 3m)\",\n          \"range\": true,\n          \"refId\": \"A\"\n        },\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"(sa:gateway_error_ratio:rate30m / 0.005) or vector(0)\",\n          \"legendFormat\": \"Burn Rate (Ventana 30m)\",\n          \"range\": true,\n          \"refId\": \"B\"\n        }\n      ],\n      \"title\": \"Tasa de Quema Actual (Burn Rate)\",\n      \"description\": \"\xBFA qu\xE9 velocidad se consume el presupuesto? (1.0 = sostenible, >14.4 = cr\xEDtico)\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"collapsed\": false,\n      \"gridPos\": { \"h\": 1, \"w\": 24, \"x\": 0, \"y\": 7 },\n      \"id\": 200,\n      \"title\": \"2. LAS CUATRO SE\xD1ALES DE ORO (GOLDEN SIGNALS)\",\n      \"type\": \"row\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\": { \"drawStyle\": \"line\", \"lineInterpolation\": \"smooth\" },\n          \"unit\": \"s\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 7, \"w\": 12, \"x\": 0, \"y\": 8 },\n      \"id\": 4,\n      \"options\": { \"legend\": { \"displayMode\": \"table\", \"placement\": \"bottom\", \"calcs\": [\"lastNotNull\", \"max\"] } },\n      \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"histogram_quantile(0.95, sum by (app, le) (rate(http_server_request_duration_seconds_bucket{namespace=\\\"sa-p8-prod\\\"}[2m])))\",\n          \"legendFormat\": \"{{app}} (p95)\",\n          \"range\": true,\n          \"refId\": \"A\"\n        },\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"histogram_quantile(0.50, sum by (app, le) (rate(http_server_request_duration_seconds_bucket{namespace=\\\"sa-p8-prod\\\"}[2m])))\",\n          \"legendFormat\": \"{{app}} (p50)\",\n          \"range\": true,\n          \"refId\": \"B\"\n        }\n      ],\n      \"title\": \"Se\xF1al 1: Latencia (p50 y p95 por Microservicio)\",\n      \"description\": \"\xBFQu\xE9 tan r\xE1pido responde cada microservicio a las peticiones?\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\": { \"drawStyle\": \"line\", \"lineInterpolation\": \"smooth\" },\n          \"unit\": \"reqps\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 7, \"w\": 12, \"x\": 12, \"y\": 8 },\n      \"id\": 5,\n      \"options\": { \"legend\": { \"displayMode\": \"table\", \"placement\": \"bottom\", \"calcs\": [\"lastNotNull\", \"mean\"] } },\n      \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"sum by (app) (rate(http_server_request_duration_seconds_count{namespace=\\\"sa-p8-prod\\\"}[2m]))\",\n          \"legendFormat\": \"{{app}} (req/s)\",\n          \"range\": true,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"Se\xF1al 2: Tr\xE1fico (Peticiones por Segundo)\",\n      \"description\": \"\xBFCu\xE1nta demanda est\xE1 procesando cada servicio?\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\": { \"drawStyle\": \"bars\", \"fillOpacity\": 50 },\n          \"unit\": \"percentunit\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 7, \"w\": 12, \"x\": 0, \"y\": 15 },\n      \"id\": 6,\n      \"options\": { \"legend\": { \"displayMode\": \"table\", \"placement\": \"bottom\", \"calcs\": [\"lastNotNull\", \"max\"] } },\n      \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"(sum by (app) (rate(http_server_request_duration_seconds_count{namespace=\\\"sa-p8-prod\\\",http_response_status_code=~\\\"5..\\\"}[2m])) or vector(0)) / sum by (app) (rate(http_server_request_duration_seconds_count{namespace=\\\"sa-p8-prod\\\"}[2m]))\",\n          \"legendFormat\": \"{{app}} Tasa 5xx\",\n          \"range\": true,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"Se\xF1al 3: Errores (Tasa de Respuestas HTTP 5xx)\",\n      \"description\": \"\xBFQui\xE9n est\xE1 fallando y en qu\xE9 porcentaje?\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\": { \"drawStyle\": \"line\", \"lineInterpolation\": \"smooth\" },\n          \"unit\": \"percentunit\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 7, \"w\": 12, \"x\": 12, \"y\": 15 },\n      \"id\": 7,\n      \"options\": { \"legend\": { \"displayMode\": \"table\", \"placement\": \"bottom\", \"calcs\": [\"lastNotNull\", \"max\"] } },\n      \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\\\"sa-p8-prod\\\",container!=\\\"\\\"}[2m])) / sum by (pod) (container_spec_cpu_quota{namespace=\\\"sa-p8-prod\\\",container!=\\\"\\\"} / 100000)\",\n          \"legendFormat\": \"{{pod}} (CPU vs Limit)\",\n          \"range\": true,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"Se\xF1al 4: Saturaci\xF3n (Uso de CPU relativo a l\xEDmites)\",\n      \"description\": \"\xBFQu\xE9 tan cerca del l\xEDmite de CPU est\xE1 operando cada Pod?\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"collapsed\": false,\n      \"gridPos\": { \"h\": 1, \"w\": 24, \"x\": 0, \"y\": 22 },\n      \"id\": 300,\n      \"title\": \"3. M\xC9TRICAS DE NEGOCIO Y DESPLIEGUE CANARY\",\n      \"type\": \"row\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\": { \"drawStyle\": \"line\" },\n          \"unit\": \"short\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 7, \"w\": 12, \"x\": 0, \"y\": 23 },\n      \"id\": 8,\n      \"options\": { \"legend\": { \"displayMode\": \"table\", \"placement\": \"bottom\", \"calcs\": [\"lastNotNull\"] } },\n      \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"sum by (resultado) (rate(sa_logins_total[2m]))\",\n          \"legendFormat\": \"Logins ({{resultado}})\",\n          \"range\": true,\n          \"refId\": \"A\"\n        },\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"rate(sa_usuarios_registrados_total[2m])\",\n          \"legendFormat\": \"Usuarios Registrados/s\",\n          \"range\": true,\n          \"refId\": \"B\"\n        },\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"rate(sa_modulos_completados_total[2m])\",\n          \"legendFormat\": \"M\xF3dulos Completados/s\",\n          \"range\": true,\n          \"refId\": \"C\"\n        }\n      ],\n      \"title\": \"M\xE9tricas de Negocio\",\n      \"description\": \"\xBFEst\xE1 ocurriendo la actividad relevante para los usuarios?\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": { \"mode\": \"palette-classic\" },\n          \"custom\": { \"drawStyle\": \"bars\", \"fillOpacity\": 40 },\n          \"unit\": \"short\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\": { \"h\": 7, \"w\": 12, \"x\": 12, \"y\": 23 },\n      \"id\": 9,\n      \"options\": { \"legend\": { \"displayMode\": \"table\", \"placement\": \"bottom\", \"calcs\": [\"lastNotNull\"] } },\n      \"targets\": [\n        {\n          \"datasource\": { \"type\": \"prometheus\", \"uid\": \"prometheus\" },\n          \"editorMode\": \"code\",\n          \"expr\": \"sum by (rollouts_pod_template_hash) (kube_pod_status_phase{namespace=\\\"sa-p8-prod\\\",pod=~\\\"progreso-service-.*\\\",phase=\\\"Running\\\"})\",\n          \"legendFormat\": \"Hash Pod: {{rollouts_pod_template_hash}}\",\n          \"range\": true,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"Estado del Canary: R\xE9plicas Activas por Versi\xF3n\",\n      \"description\": \"\xBFExiste un despliegue progresivo activo en progreso-service?\",\n      \"type\": \"timeseries\"\n    }\n  ],\n  \"refresh\": \"10s\",\n  \"schemaVersion\": 39,\n  \"tags\": [\"observability\", \"p10\", \"slo\", \"golden-signals\", \"usac\"],\n  \"time\": { \"from\": \"now-30m\", \"to\": \"now\" },\n  \"timepicker\": { \"refresh_intervals\": [\"5s\", \"10s\", \"30s\", \"1m\"] },\n  \"timezone\": \"browser\",\n  \"title\": \"SA-Operacion: Tablero de las 4 Se\xF1ales de Oro y SLOs\",\n  \"uid\": \"sa-operacion-p10\"\n}\n"
-"kind": |-
-  ConfigMap
-"metadata":
-  "labels":
-    "grafana_dashboard": |-
-      1
-  "name": |-
-    sa-operacion-dashboard
-  "namespace": |-
-    observability
+apiVersion: v1
+data:
+  sa-operacion.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "title": "1. OBJETIVOS DE NIVEL DE SERVICIO (SLO) Y PRESUPUESTO DE ERROR",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "max": 1,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 0.5 },
+                  { "color": "red", "value": 0.9 }
+                ]
+              },
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 6, "w": 8, "x": 0, "y": 1 },
+          "id": 1,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "11.0.0",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "sa:gateway_error_budget_consumed:ratio_7d or vector(0)",
+              "legendFormat": "Presupuesto Consumido (7d)",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "SLO Disponibilidad: Presupuesto Consumido (7d)",
+          "description": "¿Cuánto margen de error queda en la ventana de 7 días? (Meta 99.5%, Presupuesto 0.5%)",
+          "type": "gauge"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "max": 1,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 0.5 },
+                  { "color": "red", "value": 0.9 }
+                ]
+              },
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 6, "w": 8, "x": 8, "y": 1 },
+          "id": 2,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "11.0.0",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "(1 - (sum(rate({__name__=~\"http_server_request_duration(_seconds)?_bucket\",namespace=\"sa-p8-prod\",app=\"gateway\",le=\"0.5\"}[7d])) or vector(1)) / (sum(rate({__name__=~\"http_server_request_duration(_seconds)?_count\",namespace=\"sa-p8-prod\",app=\"gateway\"}[7d])) or vector(1))) / 0.05",
+              "legendFormat": "Presupuesto Consumido (7d)",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "SLO Latencia: Presupuesto Consumido (7d)",
+          "description": "¿Cuánto margen de solicitudes lentas queda? (Meta 95% < 500ms, Presupuesto 5%)",
+          "type": "gauge"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "axisCenteredZero": false, "axisColorMode": "text", "drawStyle": "line", "lineInterpolation": "smooth" },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 6, "w": 8, "x": 16, "y": 1 },
+          "id": 3,
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "(sa:gateway_error_ratio:rate3m / 0.005) or vector(0)",
+              "legendFormat": "Burn Rate (Ventana 3m)",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "(sa:gateway_error_ratio:rate30m / 0.005) or vector(0)",
+              "legendFormat": "Burn Rate (Ventana 30m)",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Tasa de Quema Actual (Burn Rate)",
+          "description": "¿A qué velocidad se consume el presupuesto? (1.0 = sostenible, >14.4 = crítico)",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
+          "id": 200,
+          "title": "2. LAS CUATRO SEÑALES DE ORO (GOLDEN SIGNALS)",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 8 },
+          "id": 4,
+          "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] } },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "histogram_quantile(0.95, sum by (app, le) (rate({__name__=~\"http_server_request_duration(_seconds)?_bucket\",namespace=\"sa-p8-prod\"}[2m])))",
+              "legendFormat": "{{app}} (p95)",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "histogram_quantile(0.50, sum by (app, le) (rate({__name__=~\"http_server_request_duration(_seconds)?_bucket\",namespace=\"sa-p8-prod\"}[2m])))",
+              "legendFormat": "{{app}} (p50)",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Señal 1: Latencia (p50 y p95 por Microservicio)",
+          "description": "¿Qué tan rápido responde cada microservicio a las peticiones?",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 8 },
+          "id": 5,
+          "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "mean"] } },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "sum by (app) (rate({__name__=~\"http_server_request_duration(_seconds)?_count\",namespace=\"sa-p8-prod\"}[2m]))",
+              "legendFormat": "{{app}} (req/s)",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Señal 2: Tráfico (Peticiones por Segundo)",
+          "description": "¿Cuánta demanda está procesando cada servicio?",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "drawStyle": "bars", "fillOpacity": 50 },
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 15 },
+          "id": 6,
+          "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] } },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "((sum by (app) (rate({__name__=~\"http_server_request_duration(_seconds)?_count\",namespace=\"sa-p8-prod\",http_response_status_code=~\"5..\"}[2m]))) / (sum by (app) (rate({__name__=~\"http_server_request_duration(_seconds)?_count\",namespace=\"sa-p8-prod\"}[2m])))) or (0 * sum by (app) (rate({__name__=~\"http_server_request_duration(_seconds)?_count\",namespace=\"sa-p8-prod\"}[2m])))",
+              "legendFormat": "{{app}} Tasa 5xx",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Señal 3: Errores (Tasa de Respuestas HTTP 5xx)",
+          "description": "¿Quién está fallando y en qué porcentaje?",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 15 },
+          "id": 7,
+          "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"] } },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"sa-p8-prod\",container!=\"\"}[2m])) / sum by (pod) (container_spec_cpu_quota{namespace=\"sa-p8-prod\",container!=\"\"} / 100000)",
+              "legendFormat": "{{pod}} (CPU vs Limit)",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Señal 4: Saturación (Uso de CPU relativo a límites)",
+          "description": "¿Qué tan cerca del límite de CPU está operando cada Pod?",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+          "id": 300,
+          "title": "3. MÉTRICAS DE NEGOCIO Y DESPLIEGUE CANARY",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "drawStyle": "line" },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 23 },
+          "id": 8,
+          "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] } },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "sum by (resultado) (rate(sa_logins_total[2m]))",
+              "legendFormat": "Logins ({{resultado}})",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "rate(sa_usuarios_registrados_total[2m])",
+              "legendFormat": "Usuarios Registrados/s",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "rate(sa_modulos_completados_total[2m])",
+              "legendFormat": "Módulos Completados/s",
+              "range": true,
+              "refId": "C"
+            }
+          ],
+          "title": "Métricas de Negocio",
+          "description": "¿Está ocurriendo la actividad relevante para los usuarios?",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": { "drawStyle": "bars", "fillOpacity": 40 },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 23 },
+          "id": 9,
+          "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] } },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
+              "editorMode": "code",
+              "expr": "sum by (rollouts_pod_template_hash) (kube_pod_status_phase{namespace=\"sa-p8-prod\",pod=~\"progreso-service-.*\",phase=\"Running\"})",
+              "legendFormat": "Hash Pod: {{rollouts_pod_template_hash}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Estado del Canary: Réplicas Activas por Versión",
+          "description": "¿Existe un despliegue progresivo activo en progreso-service?",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 39,
+      "tags": ["observability", "p10", "slo", "golden-signals", "usac"],
+      "time": { "from": "now-30m", "to": "now" },
+      "timepicker": { "refresh_intervals": ["5s", "10s", "30s", "1m"] },
+      "timezone": "browser",
+      "title": "SA-Operacion: Tablero de las 4 Señales de Oro y SLOs",
+      "uid": "sa-operacion-p10"
+    }
+kind: ConfigMap
+metadata:
+  name: sa-operacion-dashboard
+  namespace: observability
