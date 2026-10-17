@@ -363,5 +363,7 @@ data:
     }
 kind: ConfigMap
 metadata:
+  labels:
+    grafana_dashboard: "1"
   name: sa-operacion-dashboard
   namespace: observability
